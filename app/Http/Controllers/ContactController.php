@@ -5,10 +5,87 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ContactController extends Controller
 {
+    private $datatableColumns;
+    private $datatableHeaders;
+    private $datatableUrl;
+
+    public function __construct()
+    {
+        $this->datatableHeaders = [
+            'ID',
+            'Name',
+            'Email',
+            'Subject'
+        ];
+        $this->datatableColumns = [
+            ['data' => 'id'],
+            ['data' => 'name'],
+            ['data' => 'email'],
+            ['data' => 'subject'],
+        ];
+
+        $this->datatableUrl = route('contacts-datatables');
+    }
+
+    public function datatables()
+    {
+        $query = new Contact();
+        $query = $query->newQuery();
+        return datatables()->eloquent($query)
+            ->addColumn('action', function ($contact) {
+                $buttons = '';
+                $buttons .= '<a class="btn btn-primary" href="' . route('contacts.edit', $contact->id) . '" title="' . __('Edit Contact') . '">Edit</a>';
+
+                $buttons .= '<form action="' . route('contacts.destroy', $contact->id) . '"  id="delete-form-' .
+                    $contact->id . '" method="post" style="display: inline-block">
+<input type="hidden" name="_token" value="' . csrf_token() . '">
+<input type="hidden" name="_method" value="DELETE">
+<button class="btn btn-danger ml-1" onclick="return makeDeleteRequest(event, ' . $contact->id . ')"  type="submit" title="'
+                    . __('Delete Contact') . '">Delete</button></form>';
+
+                return $buttons;
+            })->addColumn('name', function ($contact) {
+                return Str::lower($contact->name);
+            })->addColumn('email', function ($contact) {
+                return $contact->email;
+            })->rawColumns(['action', 'name', 'email'])->addIndexColumn()->make(true);
+    }
+
+
+    public function datatablesCopy()
+    {
+        $datatables = datatables()->of(Contact::query())
+            ->addColumn('id', function ($contact) {
+                return $contact->id;
+            })
+            ->addColumn('name', function ($contact) {
+                return $contact->name;
+            })
+            ->addColumn('email', function ($contact) {
+                return $contact->email;
+            })
+            ->addColumn('subject', function ($contact) {
+                return $contact->subject;
+            })
+            ->toArray();
+        return response()->json($datatables);
+    }
+
+
+    public function dataTableShow(Request $request)
+    {
+        return Inertia::render('ContactsDatatable')
+            ->with('page_title', 'Contact Datatable')
+            ->with('datatableUrl', $this->datatableUrl)
+            ->with('datatableColumns', $this->datatableColumns)
+            ->with('datatableHeaders', $this->datatableHeaders);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +94,15 @@ class ContactController extends Controller
     public function index()
     {
         $data['page_title'] = 'All Contacts';
-        $data['contacts']   = Contact::latest()->paginate(10);
+        $query              = Contact::query();
+        if (\request()->get('query') != null) {
+            $search = \request()->get('query');
+            $query  = $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%')
+                ->orWhere('subject', 'like', '%' . $search . '%')
+                ->orWhere('message', 'like', '%' . $search . '%');
+        }
+        $data['contacts'] = $query->paginate(10);
         return Inertia::render('AllContactsComponent', $data);
     }
 

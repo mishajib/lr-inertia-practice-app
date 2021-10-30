@@ -23,5 +23,10 @@ Route::get('/contact', function () {
         'page_title' => 'Contact Us'
     ]);
 });
+
+Route::get('/contacts-datatable/index', [ContactController::class, 'dataTableShow'])->name('contacts-datatable');
+Route::get('/contacts-datatable', [ContactController::class, 'datatables'])->name('contacts-datatables');
+
 Route::resource('/contacts', ContactController::class);
+
 

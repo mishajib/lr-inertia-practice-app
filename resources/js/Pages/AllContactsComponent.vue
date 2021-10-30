@@ -5,6 +5,9 @@
             <div class="card-header">
                 <h4 class="card-title">
                     {{ $page.props.page_title }}
+
+                    <input type="text" class="form-control" v-model="query" @input="searchHandler"
+                           placeholder="Search here....">
                 </h4>
             </div>
             <div class="card-body">
@@ -51,14 +54,24 @@
 
 <script>
 export default {
-    name  : "ContactComponent",
-    props : {
+    name    : "ContactComponent",
+    props   : {
         contacts : Object,
         required : true
     },
-    data  : () => ({
-        dataLoaded : false
+    data    : () => ({
+        dataLoaded : false,
+        query      : '',
     }),
+    methods : {
+        searchHandler() {
+            if (this.query === '') {
+                this.$inertia.replace('/contacts');
+            } else {
+                this.$inertia.replace('/contacts?query=' + this.query);
+            }
+        },
+    },
     mounted() {
         this.dataLoaded = true;
     }

@@ -22,6 +22,10 @@
         "@inertiajs/inertia": "^0.10.1",
         "@inertiajs/inertia-vue": "^0.7.2",
         "@inertiajs/progress": "^0.2.6",
+        "datatables.net-buttons": "^2.0.1",
+        "datatables.net-buttons-dt": "^2.0.1",
+        "datatables.net-dt": "^1.11.3",
+        "jquery": "^3.6.0",
         "vue": "^2.6.14"
     }
 }

@@ -31,6 +31,12 @@
                                               href="/contacts">
                                     All Contacts
                                 </inertia-link>
+
+                                <inertia-link class="nav-link"
+                                              :class="{ 'active': $page.url === '/contacts-datatable/index' }"
+                                              href="/contacts-datatable/index">
+                                    Contacts Datatable
+                                </inertia-link>
                             </div>
                         </div>
                     </div>
