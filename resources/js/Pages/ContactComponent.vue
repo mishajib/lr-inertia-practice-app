@@ -61,7 +61,10 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn btn-primary float-end" type="submit">
+                    <button class="btn btn-primary float-end" type="submit" v-if="$page.props.edit_mode">
+                        Update
+                    </button>
+                    <button class="btn btn-primary float-end" type="submit" v-else>
                         Send
                     </button>
                 </div>
@@ -79,19 +82,31 @@ export default {
     }),
     methods : {
         submit() {
-            this.form.post('/contacts', {
-                preserveScroll : true,
-                onSuccess      : () => this.form.reset(),
-            })
+            if (this.$page.props.edit_mode) {
+                this.form.put('/contacts/' + this.form.id, {
+                    preserveScroll : true
+                })
+            } else {
+                this.form.post('/contacts', {
+                    preserveScroll : true,
+                    onSuccess      : () => this.form.reset(),
+                })
+            }
         }
     },
     mounted() {
-        this.form = this.$inertia.form({
-            name    : '',
-            email   : '',
-            subject : '',
-            message : ''
-        });
+
+        if (this.$page.props.edit_mode) {
+            this.form = this.$inertia.form(this.$page.props.contact);
+        } else {
+            this.form = this.$inertia.form({
+                name    : '',
+                email   : '',
+                subject : '',
+                message : ''
+            });
+        }
+
         this.dataLoaded = true;
     }
 }

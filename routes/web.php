@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'WelcomeComponent');
 Route::inertia('/about', 'AboutComponent');
 
+Route::get('/contact', function () {
+    return Inertia::render('ContactComponent', [
+        'page_title' => 'Contact Us'
+    ]);
+});
 Route::resource('/contacts', ContactController::class);
+

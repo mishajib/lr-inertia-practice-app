@@ -12,6 +12,7 @@ Vue.component('head-component', Head);
 InertiaProgress.init();
 
 Vue.component('app-layout', require('./Layouts/AppComponent').default);
+Vue.component('pagination', require('./Pages/PaginationComponent').default);
 
 createInertiaApp({
     resolve : name => require(`./Pages/${name}`),

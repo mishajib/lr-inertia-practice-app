@@ -22,9 +22,14 @@
                                               href="/about">
                                     About
                                 </inertia-link>
+                                <inertia-link class="nav-link" :class="{ 'active': $page.url === '/contact' }"
+                                              href="/contact">
+                                    Contact
+                                </inertia-link>
+
                                 <inertia-link class="nav-link" :class="{ 'active': $page.url === '/contacts' }"
                                               href="/contacts">
-                                    Contact
+                                    All Contacts
                                 </inertia-link>
                             </div>
                         </div>

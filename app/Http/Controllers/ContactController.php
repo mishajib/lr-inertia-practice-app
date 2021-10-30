@@ -16,9 +16,9 @@ class ContactController extends Controller
      */
     public function index()
     {
-        return Inertia::render('ContactComponent', [
-            'page_title' => 'Contact Us'
-        ]);
+        $data['page_title'] = 'All Contacts';
+        $data['contacts']   = Contact::latest()->paginate(10);
+        return Inertia::render('AllContactsComponent', $data);
     }
 
     /**
@@ -68,34 +68,46 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param Contact $contact
+     * @return \Inertia\Response
      */
-    public function edit($id)
+    public function edit(Contact $contact)
     {
-        //
+        $data['page_title'] = 'Edit Contact';
+        $data['contact']    = $contact;
+        $data['edit_mode']  = true;
+        return Inertia::render('ContactComponent', $data);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param Contact $contact
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Contact $contact)
     {
-        //
+        $contact->update($request->validate([
+            'name'    => ['bail', 'required', 'string'],
+            'email'   => ['bail', 'required', 'string', 'email', 'unique:contacts,id,:id'],
+            'subject' => ['bail', 'required', 'string'],
+            'message' => ['bail', 'required', 'string'],
+        ]));
+
+        return back()->with('success', 'Contact updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param Contact $contact
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(Contact $contact)
     {
-        //
+        $contact->deleteOrFail();
+
+        return back()->with('success', 'Contact deleted successfully.');
     }
 }
